@@ -1,13 +1,12 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, type FormEvent } from 'react'
 import { Check, Copy } from 'lucide-react'
 import Reveal from '../components/Reveal'
-import Button from '../components/Button'
 import { bank } from '../data/config'
 
 export default function Donate() {
   const [copied, setCopied] = useState(false)
-  const navigate = useNavigate()
+  const [status, setStatus] = useState('')
+  const [sending, setSending] = useState(false)
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(bank.accountNumber)
@@ -18,6 +17,22 @@ export default function Donate() {
     }
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+  async function submitDonation(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const formElement = e.currentTarget
+    setSending(true)
+    setStatus('')
+    const form = new FormData(formElement)
+    try {
+      const response = await fetch('/api/donation-confirmation', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: form.get('name'), email: form.get('email'), phone: form.get('phone') }) })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || 'We could not send your confirmation right now.')
+      setStatus('Thank you. Your donation notice has been received and a confirmation email is on its way.')
+      formElement.reset()
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Something went wrong. Please try again.')
+    } finally { setSending(false) }
   }
   return (
     <section className="relative min-h-screen overflow-hidden bg-forest px-5 pb-20 pt-32 text-cream sm:px-8">
@@ -45,7 +60,14 @@ export default function Donate() {
               </div>
             </dl>
             <p className="mt-6 text-sm leading-relaxed text-forest/70">Make your transfer using your preferred banking application. Once you’ve completed your contribution, return here and let us know.</p>
-            <Button variant="dark" className="mt-6 w-full" onClick={() => navigate('/thank-you')}>I’ve Donated</Button>
+            <form onSubmit={submitDonation} className="mt-7 space-y-4">
+              <p className="text-sm font-semibold">After your transfer, share your details for a confirmation email.</p>
+              <label className="block text-sm">Full name<input required name="name" autoComplete="name" className="mt-1.5 min-h-12 w-full rounded-xl border border-forest/15 bg-white px-4 text-forest outline-none focus:border-forest" /></label>
+              <label className="block text-sm">Email address<input required type="email" name="email" autoComplete="email" className="mt-1.5 min-h-12 w-full rounded-xl border border-forest/15 bg-white px-4 text-forest outline-none focus:border-forest" /></label>
+              <label className="block text-sm">Phone number<input required type="tel" name="phone" autoComplete="tel" className="mt-1.5 min-h-12 w-full rounded-xl border border-forest/15 bg-white px-4 text-forest outline-none focus:border-forest" /></label>
+              <button disabled={sending} className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-forest px-7 text-sm font-semibold text-cream transition hover:bg-forest-soft disabled:opacity-60">{sending ? 'Sending…' : 'I’ve Donated'}</button>
+              <p role="status" aria-live="polite" className="text-sm text-forest/75">{status}</p>
+            </form>
           </div>
         </Reveal>
       </div>

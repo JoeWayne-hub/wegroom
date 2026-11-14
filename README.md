@@ -73,3 +73,12 @@ export default defineConfig([
 ])
 
 ```
+# Email confirmations (Vercel + Resend)
+
+Donation and volunteer confirmation emails are sent by Vercel serverless functions through Resend. No email API key belongs in the website's browser code.
+
+1. Create a Resend account and verify a sending domain you control. Set `RESEND_API_KEY` and `RESEND_FROM_EMAIL` in the Vercel project settings. `RESEND_FROM_EMAIL` must use the verified domain, for example `WeGroom <hello@your-verified-domain>`.
+2. Set `WEGROOM_CONTACT_EMAIL` in Vercel to the inbox that should receive volunteer applications.
+3. Redeploy the site after saving the environment variables. The forms return a clear error until those settings are present.
+
+Donation form submissions send a confirmation to the donor. Volunteer submissions send the contact details to `WEGROOM_CONTACT_EMAIL` and a receipt to the volunteer. The current donation form records that the donor has made a transfer; it does not verify bank transactions.

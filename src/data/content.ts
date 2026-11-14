@@ -25,7 +25,7 @@ export const differentiators = [
 export const pillars = [
   {
     no: '01',
-    name: 'Swift Community Growth Initiative',
+    name: 'Community Growth Initiative',
     text: 'Community development begins with people. This pillar is intended to open doors through skill acquisition, education, and sport and entertainment, laying the groundwork for lasting community growth.',
     items: ['Skill acquisition and empowerment', 'Education', 'Sport and entertainment'],
   },
