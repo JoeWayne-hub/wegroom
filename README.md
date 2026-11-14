@@ -81,4 +81,4 @@ Donation and volunteer confirmation emails are sent by Vercel serverless functio
 2. Set `WEGROOM_CONTACT_EMAIL` in Vercel to the inbox that should receive volunteer applications.
 3. Redeploy the site after saving the environment variables. The forms return a clear error until those settings are present.
 
-Donation form submissions send a confirmation to the donor. Volunteer submissions send the contact details to `WEGROOM_CONTACT_EMAIL` and a receipt to the volunteer. The current donation form records that the donor has made a transfer; it does not verify bank transactions.
+Donation submissions send the donor a branded receipt and send a donor-reported amount, contact details, and Lagos submission time to `WEGROOM_CONTACT_EMAIL`. The team must reconcile each report against bank records; the form does not verify transfers or update the public fundraising total. Volunteer submissions send the contact details to `WEGROOM_CONTACT_EMAIL` and a branded receipt to the volunteer.

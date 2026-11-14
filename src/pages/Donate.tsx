@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Check, Copy } from 'lucide-react'
 import Reveal from '../components/Reveal'
 import { bank } from '../data/config'
@@ -7,6 +8,7 @@ export default function Donate() {
   const [copied, setCopied] = useState(false)
   const [status, setStatus] = useState('')
   const [sending, setSending] = useState(false)
+  const navigate = useNavigate()
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(bank.accountNumber)
@@ -25,11 +27,11 @@ export default function Donate() {
     setStatus('')
     const form = new FormData(formElement)
     try {
-      const response = await fetch('/api/donation-confirmation', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: form.get('name'), email: form.get('email'), phone: form.get('phone') }) })
+      const response = await fetch('/api/donation-confirmation', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: form.get('name'), email: form.get('email'), phone: form.get('phone'), amount: form.get('amount') }) })
       const result = await response.json()
       if (!response.ok) throw new Error(result.error || 'We could not send your confirmation right now.')
-      setStatus('Thank you. Your donation notice has been received and a confirmation email is on its way.')
       formElement.reset()
+      navigate('/thank-you', { state: { returnHome: true } })
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Something went wrong. Please try again.')
     } finally { setSending(false) }
@@ -65,6 +67,7 @@ export default function Donate() {
               <label className="block text-sm">Full name<input required name="name" autoComplete="name" className="mt-1.5 min-h-12 w-full rounded-xl border border-forest/15 bg-white px-4 text-forest outline-none focus:border-forest" /></label>
               <label className="block text-sm">Email address<input required type="email" name="email" autoComplete="email" className="mt-1.5 min-h-12 w-full rounded-xl border border-forest/15 bg-white px-4 text-forest outline-none focus:border-forest" /></label>
               <label className="block text-sm">Phone number<input required type="tel" name="phone" autoComplete="tel" className="mt-1.5 min-h-12 w-full rounded-xl border border-forest/15 bg-white px-4 text-forest outline-none focus:border-forest" /></label>
+              <label className="block text-sm">Amount transferred (₦)<input required type="number" min="1" step="0.01" inputMode="decimal" name="amount" className="mt-1.5 min-h-12 w-full rounded-xl border border-forest/15 bg-white px-4 text-forest outline-none focus:border-forest" /></label>
               <button disabled={sending} className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-forest px-7 text-sm font-semibold text-cream transition hover:bg-forest-soft disabled:opacity-60">{sending ? 'Sending…' : 'I’ve Donated'}</button>
               <p role="status" aria-live="polite" className="text-sm text-forest/75">{status}</p>
             </form>
