@@ -1,5 +1,5 @@
-import type { VercelRequest, VercelResponse } from '../lib/email'
-import { brandedEmail, getContact, safe, sendEmail } from '../lib/email'
+import type { VercelRequest, VercelResponse } from '../lib/email.js'
+import { brandedEmail, getContact, safe, sendEmail } from '../lib/email.js'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed.' })
